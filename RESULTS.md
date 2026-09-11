@@ -124,20 +124,71 @@ Router overhead, one CPU core:
 Charged on every request including escalated ones. Negligible against a 550 ms
 model call, but not free — and the heuristic is 79× faster for better ranking.
 
-## 5. What this does and does not show
+## 5. Cascade: the signal is real but too weak to pay for
+
+Second experiment, zero additional API calls — reuses the same 480 records.
+Instead of predicting from the prompt, escalate on the small model's own
+behaviour. The stored per-request output-token count is the candidate signal.
+
+**The separation is real.** Items the 20B answers wrong average **129.4 output
+tokens; items it answers correctly average 93.5** — a 1.38× difference. The
+model does expend more reasoning on problems it goes on to fail.
+
+**It is nowhere near strong enough.** Held-out AUC:
+
+| feature set | AUC |
+|---|---|
+| prompt features only | 0.558 |
+| small-model behaviour only | 0.549 |
+| prompt + behaviour | 0.589 |
+
+Behaviour adds roughly 3 points of AUC to a classifier already near chance.
+
+**Cascade economics make it worse.** An escalated item pays both tiers' cost
+and both latencies, because the small model already ran. Selected points from
+the frontier:
+
+| tau | kept on small | quality | $/1k | p50 | beats random |
+|---|---|---|---|---|---|
+| 0.40 | 81.9% | 0.7083 | 0.1806 | 0.61s | 83% |
+| 0.50 | 44.4% | 0.7014 | 0.4137 | 1.72s | 20% |
+| **0.65** | 11.8% | **0.7361** | **0.5931** | 2.51s | 62% |
+
+Always-large is 0.7361 at $0.5543. **At tau=0.65 the cascade matches
+always-large's quality while costing 7% MORE** — it paid the small tier on every
+request and still escalated the hard ones. No point on the frontier beats
+always-large on both axes.
+
+The best trade is tau=0.40: 67% cheaper than always-large for 2.8 points of
+accuracy, beating random at a matched rate in 83% of draws. Real, but below
+significance, and a trade rather than a win.
+
+**Why the cascade cannot pay here:** the small tier costs only 13% of
+always-large, so escalation roughly doubles an item's bill. To come out ahead,
+the cascade must escalate rarely *and* escalate the right items. It can do the
+first but not the second.
+
+## 6. What this does and does not show
 
 Shows: the offline-replay methodology works, the cost inversion is real and
-mechanistically explained, and prompt-only routing fails on this task with
-evidence from three independent measurements.
+mechanistically explained, and difficulty prediction fails on this task from
+**two independent directions** — the prompt (AUC 0.504 on unseen subjects) and
+the small model's own output length (0.549 held-out). The oracle proves 0.799
+accuracy at 27% of always-large cost is achievable, so the headroom is real and
+simply not reachable from either signal tested.
 
-Does not show: that routing never works. The oracle proves the headroom exists;
-the signal is simply not in the prompt. The natural next experiment is a
-**cascade** — run the small model first and escalate on its own uncertainty
-(logprobs or self-reported confidence) rather than on the input. A model's
-output carries far more evidence about whether it struggled than its input does.
-`simulate.evaluate(cascade=True)` already charges both tiers and both latencies
-for escalated items; the missing piece is capturing a confidence signal during
-evaluation.
+Does not show: that routing never works, or that cascades never work. One
+candidate signal remains untested — **token-level logprobs**, the small model's
+own confidence in the tokens it emitted. Output *length* is a crude proxy for
+that, and its weak-but-nonzero 1.38× separation suggests the sharper signal may
+carry more. Testing it needs a fresh small-tier pass with `logprobs: true`
+(~480 calls, cheap and fast since the small tier averages 98 output tokens; the
+cached large-tier results are reusable).
+
+Nor does it show anything about non-reasoning model pairs. Both tiers here are
+reasoning models, which is what produced both the cost inversion and the weak
+length signal. A pair where the small model does not emit reasoning tokens
+would behave differently on every axis measured.
 
 Also unshown: anything about open-ended generation. Every scorer here requires a
 checkable answer, so summarisation, tone, dialogue and creative work — a large

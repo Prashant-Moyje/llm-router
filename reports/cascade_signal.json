@@ -1,0 +1,197 @@
+{
+  "n": 480,
+  "auc": {
+    "small_output_tokens": 0.6063,
+    "small_latency_s": 0.5031,
+    "prompt features only": 0.5581,
+    "small-model behaviour only": 0.5493,
+    "prompt + behaviour": 0.5892
+  },
+  "reference": {
+    "always_small": {
+      "policy": "always_small",
+      "quality": 0.6806,
+      "q_lo95": 0.6042,
+      "q_hi95": 0.7569,
+      "cost_per_1k_usd": 0.0743,
+      "p50_s": 0.549,
+      "p95_s": 0.909,
+      "small_share": 1.0
+    },
+    "always_large": {
+      "policy": "always_large",
+      "quality": 0.7361,
+      "q_lo95": 0.6597,
+      "q_hi95": 0.8056,
+      "cost_per_1k_usd": 0.5543,
+      "p50_s": 2.026,
+      "p95_s": 4.926,
+      "small_share": 0.0
+    },
+    "oracle": {
+      "policy": "oracle",
+      "quality": 0.7986,
+      "q_lo95": 0.7292,
+      "q_hi95": 0.8611,
+      "cost_per_1k_usd": 0.1468,
+      "p50_s": 0.567,
+      "p95_s": 3.313,
+      "small_share": 0.8819
+    }
+  },
+  "cascade_frontier": [
+    {
+      "tau": 0.05,
+      "keep_small_share": 1.0,
+      "quality": 0.6806,
+      "cost_per_1k_usd": 0.0743,
+      "p50_s": 0.549,
+      "beats_random_pct": 0.0
+    },
+    {
+      "tau": 0.1,
+      "keep_small_share": 1.0,
+      "quality": 0.6806,
+      "cost_per_1k_usd": 0.0743,
+      "p50_s": 0.549,
+      "beats_random_pct": 0.0
+    },
+    {
+      "tau": 0.15,
+      "keep_small_share": 1.0,
+      "quality": 0.6806,
+      "cost_per_1k_usd": 0.0743,
+      "p50_s": 0.549,
+      "beats_random_pct": 0.0
+    },
+    {
+      "tau": 0.2,
+      "keep_small_share": 1.0,
+      "quality": 0.6806,
+      "cost_per_1k_usd": 0.0743,
+      "p50_s": 0.549,
+      "beats_random_pct": 0.0
+    },
+    {
+      "tau": 0.25,
+      "keep_small_share": 1.0,
+      "quality": 0.6806,
+      "cost_per_1k_usd": 0.0743,
+      "p50_s": 0.549,
+      "beats_random_pct": 0.0
+    },
+    {
+      "tau": 0.3,
+      "keep_small_share": 0.9792,
+      "quality": 0.6736,
+      "cost_per_1k_usd": 0.0862,
+      "p50_s": 0.557,
+      "beats_random_pct": 0.0
+    },
+    {
+      "tau": 0.35,
+      "keep_small_share": 0.9583,
+      "quality": 0.6736,
+      "cost_per_1k_usd": 0.1017,
+      "p50_s": 0.563,
+      "beats_random_pct": 0.033
+    },
+    {
+      "tau": 0.4,
+      "keep_small_share": 0.8194,
+      "quality": 0.7083,
+      "cost_per_1k_usd": 0.1806,
+      "p50_s": 0.61,
+      "beats_random_pct": 0.833
+    },
+    {
+      "tau": 0.45,
+      "keep_small_share": 0.6458,
+      "quality": 0.6944,
+      "cost_per_1k_usd": 0.304,
+      "p50_s": 0.739,
+      "beats_random_pct": 0.4
+    },
+    {
+      "tau": 0.5,
+      "keep_small_share": 0.4444,
+      "quality": 0.7014,
+      "cost_per_1k_usd": 0.4137,
+      "p50_s": 1.715,
+      "beats_random_pct": 0.2
+    },
+    {
+      "tau": 0.55,
+      "keep_small_share": 0.2917,
+      "quality": 0.7153,
+      "cost_per_1k_usd": 0.5053,
+      "p50_s": 2.107,
+      "beats_random_pct": 0.25
+    },
+    {
+      "tau": 0.6,
+      "keep_small_share": 0.2014,
+      "quality": 0.7153,
+      "cost_per_1k_usd": 0.5572,
+      "p50_s": 2.216,
+      "beats_random_pct": 0.15
+    },
+    {
+      "tau": 0.65,
+      "keep_small_share": 0.1181,
+      "quality": 0.7361,
+      "cost_per_1k_usd": 0.5931,
+      "p50_s": 2.509,
+      "beats_random_pct": 0.617
+    },
+    {
+      "tau": 0.7,
+      "keep_small_share": 0.0556,
+      "quality": 0.7292,
+      "cost_per_1k_usd": 0.6071,
+      "p50_s": 2.527,
+      "beats_random_pct": 0.167
+    },
+    {
+      "tau": 0.75,
+      "keep_small_share": 0.0208,
+      "quality": 0.7292,
+      "cost_per_1k_usd": 0.616,
+      "p50_s": 2.527,
+      "beats_random_pct": 0.017
+    },
+    {
+      "tau": 0.8,
+      "keep_small_share": 0.0139,
+      "quality": 0.7292,
+      "cost_per_1k_usd": 0.6178,
+      "p50_s": 2.527,
+      "beats_random_pct": 0.0
+    },
+    {
+      "tau": 0.85,
+      "keep_small_share": 0.0139,
+      "quality": 0.7292,
+      "cost_per_1k_usd": 0.6178,
+      "p50_s": 2.527,
+      "beats_random_pct": 0.0
+    },
+    {
+      "tau": 0.9,
+      "keep_small_share": 0.0139,
+      "quality": 0.7292,
+      "cost_per_1k_usd": 0.6178,
+      "p50_s": 2.527,
+      "beats_random_pct": 0.0
+    },
+    {
+      "tau": 0.95,
+      "keep_small_share": 0.0139,
+      "quality": 0.7292,
+      "cost_per_1k_usd": 0.6178,
+      "p50_s": 2.527,
+      "beats_random_pct": 0.0
+    }
+  ],
+  "cascade_dominates_always_large": []
+}

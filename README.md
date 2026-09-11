@@ -9,12 +9,19 @@ operating point, not a claim that routing is free.
 
 ## Results
 
-**Prompt-only routing does not work on this task.** A learned classifier over
-prompt text reaches AUC 0.593 in-distribution and 0.504 on unseen subjects, is
-beaten by a six-line heuristic (0.658), and does not significantly beat random
-routing at a matched escalation rate. The oracle shows the headroom is real —
-0.799 accuracy at 27% of always-large cost, beating always-large outright — so
-the signal exists; it is just not in the prompt.
+**Difficulty prediction fails from two independent directions.** A learned
+classifier over prompt text reaches AUC 0.593 in-distribution and 0.504 on
+unseen subjects, is beaten by a six-line heuristic (0.658), and does not
+significantly beat random routing at a matched escalation rate. Switching to the
+small model's own behaviour does not rescue it: items it answers wrong do run
+longer (129.4 vs 93.5 output tokens, a genuine 1.38x separation) but that yields
+only 0.549 held-out AUC, and no cascade threshold beats always-large on both
+cost and quality — at one point the cascade matches always-large's accuracy
+while costing 7% MORE, because escalated items pay both tiers.
+
+The oracle shows the headroom is real — 0.799 accuracy at 27% of always-large
+cost, beating always-large outright. The signal exists. It is in neither the
+prompt nor the output length.
 
 Two cost findings independent of the router:
 
