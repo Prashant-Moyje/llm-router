@@ -1,0 +1,62 @@
+# Baseline: BOTH tiers at default reasoning effort. This is the configuration
+# that produced effective_cost_ratio 0.97 (small cost MORE than large).
+# Kept so the null result is reproducible, not just described.
+# Always run scripts/07_diagnose.py first: Groq decommissions model IDs.
+#
+# ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# Measured on a 57-item MMLU pilot with BOTH tiers at default effort:
+#
+#   small (20B):  359.2 mean output tokens
+#   large (120B): 270.2 mean output tokens
+#   effective cost ratio: 0.97x  <- the CHEAP tier cost MORE than the expensive
+#
+# The weaker model compensates for lower capability by reasoning longer. With
+# output priced 5x input and the two tiers only 1.2x apart on the rate card,
+# that token inflation more than erased the price advantage. Cost routing to
+# the small tier was a net loss.
+#
+# Effort level is the control for this, and it is what a real deployment would
+# use: it is the difference between "small model" and "small model configured
+# to be cheap". Setting the small tier to `low` cuts its output length, and as
+# a side effect widens the capability gap - which also fixes the saturated
+# subjects that produced degenerate labels at default effort.
+#
+# Report BOTH configurations. The default-effort run is not a failed
+# experiment; it is the finding that a naive small/large split can invert.
+# See FAILURE_MODES.md §17.
+# ---------------------------------------------------------------------------
+#
+# Rates read from third-party trackers 2026-09-10, NOT confirmed against
+# groq.com/pricing. Verify before quoting.
+seed: 13
+test_size: 0.3
+sufficiency_margin: 0.0
+
+provider:
+  base_url: https://api.groq.com/openai/v1
+  api_key_env: GROQ_API_KEY
+
+small:
+  name: gpt-oss-20b-default
+  model_id: openai/gpt-oss-20b
+  input_usd_per_mtok: 0.10
+  output_usd_per_mtok: 0.50
+  max_tokens: 2048
+  supports_temperature: true
+  temperature: 0.0
+  pricing_basis: imputed
+
+
+large:
+  name: gpt-oss-120b-default
+  model_id: openai/gpt-oss-120b
+  input_usd_per_mtok: 0.15
+  output_usd_per_mtok: 0.60
+  max_tokens: 2048
+  supports_temperature: true
+  temperature: 0.0
+  pricing_basis: imputed
+
+
+paths: {data: data, artifacts: artifacts, reports: reports}

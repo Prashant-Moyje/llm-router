@@ -1,0 +1,37 @@
+# Fully local, no signup, no rate limits, no network. Slowest option.
+#   ollama pull qwen2.5:0.5b
+#   ollama pull qwen2.5:7b
+#   ollama serve
+#
+# pricing_basis is "local": you pay electricity, not tokens. The per-token
+# prices below are a MODELLING ASSUMPTION borrowed from comparable hosted
+# models so the cost axis has units. Any savings figure from this config is
+# a simulation, not a measurement. Latency, by contrast, IS real and is the
+# more defensible metric to report from a local run.
+seed: 13
+test_size: 0.3
+sufficiency_margin: 0.0
+
+provider:
+  base_url: http://localhost:11434/v1
+  api_key_env: OLLAMA_KEY
+
+small:
+  name: qwen-0.5b
+  model_id: qwen2.5:0.5b
+  input_usd_per_mtok: 0.05
+  output_usd_per_mtok: 0.08
+  max_tokens: 512
+  supports_temperature: true
+  pricing_basis: local
+
+large:
+  name: qwen-7b
+  model_id: qwen2.5:7b
+  input_usd_per_mtok: 0.59
+  output_usd_per_mtok: 0.79
+  max_tokens: 512
+  supports_temperature: true
+  pricing_basis: local
+
+paths: {data: data, artifacts: artifacts, reports: reports}

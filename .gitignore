@@ -1,0 +1,16 @@
+.env
+.env.key
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+
+# Generated data and results. NEVER distribute these — shipping a populated
+# reports/ overwrites the recipient's real results on extraction.
+data/*.jsonl
+artifacts/*.joblib
+artifacts/*.npy
+reports/*.json
+reports/*.csv
+reports/*.png

@@ -1,0 +1,30 @@
+{
+  "n_train": 336,
+  "n_test": 144,
+  "label_rate": 0.8792,
+  "stratified_split": {
+    "learned": {
+      "auc": 0.5933,
+      "ap": 0.9087,
+      "brier": 0.1034
+    },
+    "heuristic": {
+      "auc": 0.6577,
+      "ap": 0.9296,
+      "brier": 0.6539
+    },
+    "always_small_baseline_auc": 0.5
+  },
+  "grouped_split_unseen_sources": {
+    "held_out_sources": [
+      "mmlu/high_school_statistics",
+      "mmlu/professional_accounting",
+      "mmlu/professional_law"
+    ],
+    "learned": {
+      "auc": 0.5041,
+      "ap": 0.8613,
+      "brier": 0.1318
+    }
+  }
+}

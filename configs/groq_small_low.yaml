@@ -1,0 +1,47 @@
+# ONE-VARIABLE-AT-A-TIME control.
+#
+# Small tier at reasoning_effort: low. Large tier left at provider DEFAULT.
+# This isolates the small-tier effort lever, which is the one that plausibly
+# fixes the cost inversion. configs/groq.yaml changes both tiers at once and is
+# therefore confounded - it cannot tell you which change did what.
+#
+# Run order for a clean comparison, on an IDENTICAL task file:
+#   A  configs/groq_default_effort.yaml   both default      (baseline)
+#   B  configs/groq_small_low.yaml        small=low only    (the lever)
+#   C  configs/groq.yaml                  small=low,large=high  (both)
+#
+# Keep each run's records.jsonl under a distinct name - 02 resumes by task_id
+# and will happily merge records generated under different configs, silently
+# mixing conditions:
+#   Copy-Item data\records.jsonl data\records_A.jsonl
+seed: 13
+test_size: 0.3
+sufficiency_margin: 0.0
+
+provider:
+  base_url: https://api.groq.com/openai/v1
+  api_key_env: GROQ_API_KEY
+
+small:
+  name: gpt-oss-20b-low
+  model_id: openai/gpt-oss-20b
+  input_usd_per_mtok: 0.10
+  output_usd_per_mtok: 0.50
+  max_tokens: 2048
+  supports_temperature: true
+  temperature: 0.0
+  pricing_basis: imputed
+  extra_params:
+    reasoning_effort: low
+
+large:
+  name: gpt-oss-120b-default
+  model_id: openai/gpt-oss-120b
+  input_usd_per_mtok: 0.15
+  output_usd_per_mtok: 0.60
+  max_tokens: 2048
+  supports_temperature: true
+  temperature: 0.0
+  pricing_basis: imputed
+
+paths: {data: data, artifacts: artifacts, reports: reports}
