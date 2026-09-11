@@ -1,0 +1,62 @@
+{
+  "pricing": "measured (openai/gpt-oss-20b / openai/gpt-oss-120b)",
+  "quality_floor": 0.7161,
+  "always_small": {
+    "policy": "always_small",
+    "quality": 0.6806,
+    "q_lo95": 0.6042,
+    "q_hi95": 0.7569,
+    "cost_per_1k_usd": 0.0743,
+    "p50_s": 0.549,
+    "p95_s": 0.909,
+    "small_share": 1.0
+  },
+  "always_large": {
+    "policy": "always_large",
+    "quality": 0.7361,
+    "q_lo95": 0.6597,
+    "q_hi95": 0.8056,
+    "cost_per_1k_usd": 0.5543,
+    "p50_s": 2.026,
+    "p95_s": 4.926,
+    "small_share": 0.0
+  },
+  "chosen_learned": {
+    "policy": "tau=0.88",
+    "quality": 0.7361,
+    "q_lo95": 0.6736,
+    "q_hi95": 0.8057,
+    "cost_per_1k_usd": 0.3752,
+    "p50_s": 1.357,
+    "p95_s": 4.793,
+    "small_share": 0.3542,
+    "tau": 0.88
+  },
+  "chosen_heuristic": {
+    "policy": "tau=0.11",
+    "quality": 0.7222,
+    "q_lo95": 0.6526,
+    "q_hi95": 0.7917,
+    "cost_per_1k_usd": 0.3903,
+    "p50_s": 1.153,
+    "p95_s": 4.9,
+    "small_share": 0.4792,
+    "tau": 0.11
+  },
+  "cost_reduction_vs_large": 0.3231,
+  "p95_latency_reduction_vs_large": 0.0269,
+  "quality_retention": 0.9998,
+  "quality_drop_ci_overlaps_large": true,
+  "vs_random_at_matched_rate": {
+    "matched_small_share": 0.3542,
+    "random_quality_mean": 0.7185,
+    "random_quality_p05_p95": [
+      0.6875,
+      0.75
+    ],
+    "router_quality": 0.7361,
+    "router_minus_random": 0.0176,
+    "router_beats_random_in_pct_of_draws": 0.795,
+    "share_of_random_to_oracle_gap_captured": 0.219
+  }
+}
