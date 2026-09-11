@@ -6,7 +6,7 @@ that trades away. The output is a cost/quality frontier and a defensible
 operating point, not a claim that routing is free.
 
 ---
-
+**[Live demo →](https://huggingface.co/spaces/Prashantm99/llm-router)**
 ## Results
 
 **Difficulty prediction fails from two independent directions.** A learned
