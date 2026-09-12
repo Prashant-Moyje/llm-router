@@ -71,7 +71,22 @@ def main() -> None:
         idx, test_size=cfg.test_size, random_state=cfg.seed, stratify=y
     )
 
-    pipe = build_pipeline(calibrate=not args.no_calibrate, seed=cfg.seed)
+    # CalibratedClassifierCV(cv=3) needs >=3 examples of each class in every
+    # fold. On a skewed label set (here ~88% positive) the minority class can
+    # fall below that and sklearn raises rather than degrading. Drop calibration
+    # instead of failing: it only makes tau interpretable, and the Pareto sweep
+    # needs a monotone score, not a calibrated one.
+    minority = int(min((y[tr] == 0).sum(), (y[tr] == 1).sum()))
+    calibrate = not args.no_calibrate
+    if calibrate and minority < 9:
+        print(
+            f"minority class has {minority} training examples; skipping "
+            "calibration (needs >=9 for 3-fold). Ranking is unaffected; tau is "
+            "no longer interpretable as a probability."
+        )
+        calibrate = False
+
+    pipe = build_pipeline(calibrate=calibrate, seed=cfg.seed)
     pipe.fit([X[i] for i in tr], y[tr])
     learned = LearnedRouter(pipeline=pipe)
 
@@ -82,6 +97,7 @@ def main() -> None:
         "n_train": int(len(tr)),
         "n_test": int(len(te)),
         "label_rate": round(float(y.mean()), 4),
+        "calibrated": bool(calibrate),
         "stratified_split": {
             "learned": metrics(y[te], p_te),
             "heuristic": metrics(y[te], p_heur_te),
@@ -96,7 +112,10 @@ def main() -> None:
                 n_splits=1, test_size=0.34, random_state=cfg.seed
             ).split(X, y, groups)
         )
-        gpipe = build_pipeline(calibrate=not args.no_calibrate, seed=cfg.seed)
+        g_minority = int(min((y[gtr] == 0).sum(), (y[gtr] == 1).sum()))
+        gpipe = build_pipeline(
+            calibrate=calibrate and g_minority >= 9, seed=cfg.seed
+        )
         gpipe.fit([X[i] for i in gtr], y[gtr])
         gp = LearnedRouter(pipeline=gpipe).predict_proba_small_ok(
             [X[i] for i in gte]
