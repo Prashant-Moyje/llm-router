@@ -6,11 +6,36 @@ __pycache__/
 venv/
 .pytest_cache/
 
-# Generated data and results. NEVER distribute these — shipping a populated
-# reports/ overwrites the recipient's real results on extraction.
+# Generated data and results are ignored by default: a fresh clone should not
+# inherit someone else's run and silently present it as its own.
 data/*.jsonl
 artifacts/*.joblib
 artifacts/*.npy
 reports/*.json
 reports/*.csv
 reports/*.png
+reports/*.jsonl
+
+# ...with a deliberate exception for the published run. These are the exact
+# artifacts the README, RESULTS.md and the Hugging Face Space cite, and
+# Dockerfile COPYs router.joblib — without them here, `docker build` on a
+# fresh clone fails and the demo cannot be redeployed without paying for a
+# new evaluation. Re-running the pipeline overwrites them locally, which is
+# the intended way to replace this run with your own.
+!artifacts/router.joblib
+!reports/headline.json
+!reports/offline_eval.json
+!reports/cascade_signal.json
+!reports/router_latency.json
+!reports/pareto.png
+!reports/pareto_learned.csv
+!reports/pareto_heuristic.csv
+!reports/policy_comparison.csv
+!reports/failures.jsonl
+
+# The Space deploy clone. It is its own git repo with a huggingface.co remote;
+# nesting it here would commit a dangling gitlink. app.py, configs/ and the
+# artifacts above are the source of truth and get copied into it.
+hf-space/
+
+*.zip

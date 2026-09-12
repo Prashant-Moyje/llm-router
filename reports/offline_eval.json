@@ -1,0 +1,56 @@
+{
+  "n_records": 480,
+  "dropped_errors": 0,
+  "small_accuracy": 0.6937,
+  "large_accuracy": 0.7562,
+  "label_rate_small_ok": 0.8792,
+  "small_cost_usd_total": 0.034,
+  "large_cost_usd_total": 0.2588,
+  "provider": "groq",
+  "pricing_basis": "imputed/imputed",
+  "models": "openai/gpt-oss-20b vs openai/gpt-oss-120b",
+  "tokens": {
+    "small_mean_output_tokens": 97.8,
+    "large_mean_output_tokens": 844.0,
+    "rate_card_output_ratio": 1.2,
+    "effective_cost_ratio": 7.62
+  },
+  "per_source": {
+    "mmlu/econometrics": {
+      "n": 80,
+      "small_acc": 0.75,
+      "large_acc": 0.775,
+      "label_rate": 0.938
+    },
+    "mmlu/high_school_statistics": {
+      "n": 80,
+      "small_acc": 0.825,
+      "large_acc": 0.938,
+      "label_rate": 0.875
+    },
+    "mmlu/moral_scenarios": {
+      "n": 80,
+      "small_acc": 0.775,
+      "large_acc": 0.838,
+      "label_rate": 0.863
+    },
+    "mmlu/professional_accounting": {
+      "n": 80,
+      "small_acc": 0.713,
+      "large_acc": 0.838,
+      "label_rate": 0.812
+    },
+    "mmlu/professional_law": {
+      "n": 80,
+      "small_acc": 0.6,
+      "large_acc": 0.575,
+      "label_rate": 0.875
+    },
+    "mmlu/virology": {
+      "n": 80,
+      "small_acc": 0.5,
+      "large_acc": 0.575,
+      "label_rate": 0.912
+    }
+  }
+}

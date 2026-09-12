@@ -305,5 +305,20 @@ with gr.Blocks(title="LLM cost/latency router", theme=gr.themes.Soft()) as demo:
     with gr.Tab("Findings"):
         gr.Markdown(FINDINGS)
 
+
+# ZeroGPU refuses to start unless at least one @spaces.GPU function exists,
+# even for an app that never touches a GPU. This one is never called — it is
+# there to satisfy that startup check. Guarded so the app still runs locally,
+# where the spaces package is absent.
+try:
+    import spaces
+
+    @spaces.GPU(duration=1)
+    def _zerogpu_startup_probe():
+        return None
+
+except ImportError:
+    pass
+
 if __name__ == "__main__":
     demo.launch()

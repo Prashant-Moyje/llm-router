@@ -1,0 +1,17 @@
+# Serving-only deps for the Hugging Face Space (hf-space/requirements.txt).
+# scikit-learn is pinned EXACTLY: router.joblib is a pickle, and unpickling
+# it under a different minor version warns or fails outright. Bump this only
+# together with a re-trained artifacts/router.joblib.
+# Pinned to the version the Space actually runs. On Spaces the gradio
+# version comes from `sdk_version` in SPACE_README.md front matter, not
+# from here; this pin exists so a local `python app.py` behaves the same.
+# gradio 6 moved `theme` from Blocks() to launch() and warns on 5-style
+# code, so do not float this without re-testing the demo.
+gradio==5.49.1
+numpy>=1.26,<3
+pandas>=2.1
+scikit-learn==1.9.0
+scipy>=1.11
+joblib>=1.3
+PyYAML>=6.0
+matplotlib>=3.8

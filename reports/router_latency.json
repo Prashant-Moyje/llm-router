@@ -1,0 +1,17 @@
+{
+  "learned_single": {
+    "p50_ms": 4.36,
+    "p95_ms": 5.626,
+    "p99_ms": 7.642
+  },
+  "heuristic_single": {
+    "p50_ms": 0.055,
+    "p95_ms": 0.085,
+    "p99_ms": 0.117
+  },
+  "learned_batched": {
+    "batch_size": 512,
+    "total_ms": 96.59,
+    "per_item_ms": 0.1887
+  }
+}
