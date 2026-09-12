@@ -1,5 +1,9 @@
 # Results
 
+Every number below is explorable interactively at
+<https://huggingface.co/spaces/Prashantm99/llm-router> — the frontier tab
+replays the same cached evaluation this document reports.
+
 **Headline: prompt-only routing does not work on this task.** The measurement
 apparatus is sound and the cost/quality headroom is real, but a learned
 classifier over prompt text cannot predict which items the cheap model will

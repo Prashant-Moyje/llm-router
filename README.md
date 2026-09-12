@@ -1,12 +1,56 @@
 # LLM cost/latency router
 
+[![Open in Spaces](https://huggingface.co/datasets/huggingface/badges/resolve/main/open-in-hf-spaces-md.svg)](https://huggingface.co/spaces/Prashantm99/llm-router)
+
 Routes each request to a cheap model or an expensive one based on a learned
 prediction of whether the cheap model will be good enough, then measures what
 that trades away. The output is a cost/quality frontier and a defensible
 operating point, not a claim that routing is free.
 
 ---
-**[Live demo →](https://huggingface.co/spaces/Prashantm99/llm-router)**
+
+## Demo
+
+**<https://huggingface.co/spaces/Prashantm99/llm-router>**
+
+It calls no model. It loads the trained router and replays the cached 480-item
+evaluation, so every number in it is a measured one and nothing in it costs
+anything to run.
+
+### Routing decision, shown with its own reliability
+
+A prediction is returned in ~7 ms, and directly under it is the held-out AUC
+that says how much to trust it. Presenting the decision without that number
+would misrepresent the result this project exists to report.
+
+![Routing decision with reliability caveat](docs/screenshots/router-decision.png)
+
+### Cost/quality frontier vs random at a matched escalation rate
+
+Sweep τ and watch the operating point move. The grey dotted line is random
+routing escalating the *same fraction* of traffic — the only baseline that
+isolates what the router's ordering is worth, since both policies spend the
+same amount at a given rate.
+
+![Cost/quality frontier explorer](docs/screenshots/frontier.png)
+
+<details>
+<summary>Findings tab — the measured results in full</summary>
+
+![Findings tab](docs/screenshots/findings.png)
+
+</details>
+
+Reproduce the demo locally with the artifacts committed to this repo — no API
+key and no spend:
+
+```powershell
+python -m pip install -r requirements-space.txt
+python app.py                      # http://127.0.0.1:7860
+```
+
+---
+
 ## Results
 
 **Difficulty prediction fails from two independent directions.** A learned
@@ -90,16 +134,27 @@ different answer every run from sampling noise.
 ```
 src/llmrouter/
   config.py       model tiers + $/MTok, loaded from YAML (never hardcoded)
-  providers.py    Anthropic adapter + deterministic MockProvider
+  providers.py    Anthropic/OpenAI-compat adapters + deterministic MockProvider
   tasks.py        benchmark loaders (GSM8K, MMLU, synthetic) + verifiable scorers
   features.py     prompt-only features, sklearn transformer
   router.py       heuristic baseline + learned calibrated classifier
   simulate.py     replay engine, policies, bootstrap CIs, threshold sweep
   serve.py        FastAPI: /v1/route, /v1/complete, /health, /metrics
 scripts/          01 build -> 02 eval -> 03 train -> 04 simulate -> 05 plot -> 06 bench
-                  07_diagnose.py — run this first when a provider misbehaves
-configs/          default.yaml (Haiku vs Opus), sonnet_large.yaml (Haiku vs Sonnet)
-tests/            16 tests: scoring, pricing, cascade accounting, monotonicity
+                  07_diagnose.py    run this FIRST when a provider misbehaves
+                  08_summarize.py   headline.json -> the tables in RESULTS.md
+                  09_cascade_signal.py  can the small model's own output length
+                                        predict its errors? (the second null result)
+app.py            Gradio demo — the deployed Space, runnable locally
+configs/          groq.yaml is the one the published run used (20B-low vs 120B-high);
+                  groq_default_effort.yaml and groq_small_low.yaml are the two
+                  effort configurations behind the cost-inversion finding;
+                  default.yaml (Haiku vs Opus), sonnet_large.yaml, ollama.yaml
+artifacts/        router.joblib + router_meta.json — the published trained router,
+                  committed so `docker build` and the Space need no re-run
+reports/          the published measured run; re-running the pipeline overwrites it
+tests/            26 tests: scoring, pricing, cascade accounting, monotonicity,
+                  retry/latency accounting, McNemar
 ```
 
 ## Setup (Windows / PowerShell)
@@ -224,9 +279,40 @@ curl -X POST http://localhost:8000/v1/route `
 
 **Where to host it.** Any container host works — Render, Fly.io, Railway, Cloud
 Run. Set `ANTHROPIC_API_KEY` and `ROUTER_TAU` as secrets/env, never in the
-image. Hugging Face Spaces works if you want the demo and the repo in one
-place, but Spaces sleeps on the free tier, so cold-start latency will dominate
-the very metric this project measures — mention that if you demo it there.
+image.
+
+**The Gradio demo is a separate artifact from the service.** It is deployed at
+<https://huggingface.co/spaces/Prashantm99/llm-router> and deliberately calls no
+model: it returns routing decisions and replays cached evaluation results, so it
+needs no API key and nothing about it can be billed. That is also why none of
+the latencies it reports are end-to-end — a free Space sleeps and cold-starts,
+which would dominate the very metric this project measures. Model latency comes
+from `06_bench_latency.py` run against the real provider; the only latency the
+demo reports for itself is the router's own ~7 ms inference.
+
+To redeploy it:
+
+```powershell
+# hf-space/ is a clone of the Space (its own git remote), gitignored here.
+#   git clone https://huggingface.co/spaces/Prashantm99/llm-router hf-space
+Copy-Item app.py hf-space/
+Copy-Item SPACE_README.md        hf-space/README.md        # front matter = Space config
+Copy-Item requirements-space.txt hf-space/requirements.txt
+Copy-Item -Recurse -Force src, configs, artifacts hf-space/
+
+# Only the four the demo reads. Copying all of reports/ would publish the
+# side-run files too, and app.py would still ignore them.
+"headline.json", "cascade_signal.json", "pareto_learned.csv",
+  "pareto_heuristic.csv" | ForEach-Object {
+    Copy-Item "reports/$_" "hf-space/reports/$_"
+  }
+
+cd hf-space; git add -A; git commit -m "update"; git push
+```
+
+`artifacts/router.joblib` is a pickle, so the Space pins both
+`python_version: "3.12"` (in the front matter) and `scikit-learn==1.9.0`. Bump
+either only alongside a re-trained router.
 
 **What to watch in production.** `/metrics` exposes escalation rate and
 cumulative cost as Prometheus counters, because those are what drift. The
@@ -242,7 +328,7 @@ a train-once artifact.
 $env:PYTHONPATH="src"; python -m pytest tests/ -q
 ```
 
-19 tests. The ones that matter: `test_oracle_is_an_upper_bound_on_quality`
+26 tests. The ones that matter: `test_oracle_is_an_upper_bound_on_quality`
 (catches leakage — nothing may beat oracle),
 `test_cascade_charges_both_tiers_on_escalation` (catches the most common way
 these systems get oversold), `test_sweep_is_monotone_in_cost`, and
